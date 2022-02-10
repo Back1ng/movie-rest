@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
+use App\Repositories\MovieRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,41 +27,25 @@ class MovieController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $movies = DB::table('movies');
+        $movies = new MovieRepository();
 
         if ($request->has('genre')) {
-            $movies->where('genre_id', '=', $request->get('genre'));
+            $movies->whereGenre($request->get('genre'));
         }
 
         if ($request->has('actor')) {
-            $movies->join('actor_movie', 'actor_id', '=', 'movies.id');
-            $movies->where('actor_movie.actor_id', '=', $request->get('actor'));
-            $movies->leftJoin('actors', 'actors.id', '=', 'actor_movie.actor_id');
-
-            $movies->select(
-                'movies.id',
-                'movies.genre_id',
-                'movies.name',
-                'actors.name as actor_name',
-                'movies.created_at',
-                'movies.updated_at'
-            );
+            $movies->whereActor($request->get('actor'));
         }
 
         if ($request->has('sortBy')) {
-            if ($request->get('sortBy') === 'name') {
-                if ($request->has('sortType')) {
-                    match ($request->get('sortType')) {
-                        'asc' => $movies->orderBy('movies.name'),
-                        'desc' => $movies->orderByDesc('movies.name'),
-                    };
-                } else {
-                    $movies->orderBy('movies.name');
-                }
+            if ($request->has('sortType')) {
+                $movies->withSort($request->get('sortBy'), $request->get('sortType'));
+            } else {
+                $movies->withSort($request->get('sortBy'));
             }
         }
 
-        return response()->json($movies->get());
+        return response()->json($movies->getResult());
     }
 
     /**
