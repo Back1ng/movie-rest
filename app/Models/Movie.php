@@ -9,6 +9,8 @@ class Movie extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['name', 'genre_id'];
+
     public function genre()
     {
         return $this->hasOne(Genre::class);
