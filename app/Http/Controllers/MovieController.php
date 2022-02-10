@@ -33,8 +33,8 @@ class MovieController extends Controller
         }
 
         if ($request->has('actor')) {
-            $movies->join('actor_movie', 'movie_id', '=', 'movies.id');
-
+            $movies->join('actor_movie', 'actor_id', '=', 'movies.id');
+            $movies->where('actor_movie.actor_id', '=', $request->get('actor'));
             $movies->leftJoin('actors', 'actors.id', '=', 'actor_movie.actor_id');
 
             $movies->select(
