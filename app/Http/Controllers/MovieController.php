@@ -19,7 +19,7 @@ class MovieController extends Controller
      * sortBy - field (not required)
      * sortType - asc or desc (not required)
      *
-     * By default return columns: id, genre_id, name, timestamps
+     * By default, return columns: id, genre_id, name, timestamps
      * If actor id is included, return next columns: id, genre_id, name, actor_name, timestamps
      *
      * @param Request $request
@@ -54,7 +54,7 @@ class MovieController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         return response()->json(
             Movie::create($request->validate([
@@ -70,7 +70,7 @@ class MovieController extends Controller
      * @param  int  $id
      * @return JsonResponse
      */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         return response()->json(Movie::find($id));
     }
@@ -82,7 +82,7 @@ class MovieController extends Controller
      * @param  int  $id
      * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): JsonResponse
     {
         $movie = Movie::find($id);
 
@@ -110,7 +110,7 @@ class MovieController extends Controller
      * @param  int  $id
      * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         return response()->json(Movie::destroy($id));
     }
