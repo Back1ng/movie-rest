@@ -24,7 +24,7 @@ test('actor created without movies', function() {
     $this->assertEquals($response->id, 21);
 });
 
-it('throw error when trying add to non-existent movie', function () {
+test('store actor throw an error when adding non-existing movie', function () {
     $response = decodeResponse(
         $this->post('/actors', [
             'name' => "Good Name",
