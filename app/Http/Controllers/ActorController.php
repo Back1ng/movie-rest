@@ -73,10 +73,9 @@ class ActorController extends Controller
     public function update(Request $request, int $id): JsonResponse
     {
         $actor = Actor::find($id);
-        $data = $request->validate([
-            'name' => 'string|required'
-        ]);
-        $actor->name = $data['name'];
+
+        $actor->name = $request->validate(['name' => 'string|required'])['name'];
+
         $actor->save();
 
         return response()->json($actor);

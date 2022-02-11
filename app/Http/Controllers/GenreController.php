@@ -56,10 +56,9 @@ class GenreController extends Controller
     public function update(Request $request, int $id): JsonResponse
     {
         $genre = Genre::find($id);
-        $data = $request->validate([
-            'name' => 'string|required'
-        ]);
-        $genre->name = $data['name'];
+
+        $genre->name = $request->validate(['name' => 'string|required'])['name'];
+
         $genre->save();
 
         return response()->json($genre);
