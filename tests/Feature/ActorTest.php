@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Movie;
 use Database\Seeders\ActorSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses()->beforeEach(function () {
     $this->seed(ActorSeeder::class);
@@ -42,9 +42,32 @@ it('actor can be destroyed', function () {
 
     $this->assertDatabaseCount('actors', 11);
 
-    $response = decodeResponse(
-        $this->delete('/actors/' . $response->id)
-    );
+    $this->delete('/actors/' . $response->id);
 
     $this->assertDatabaseCount('actors', 10);
+});
+
+test('actor can be added with movie', function () {
+    $this->post('/genres', ['name' => 'Ужасы']);
+    $this->post('movies', ['name' => 'Оно', 'genre_id' => 1]);
+
+    $response = decodeResponse(
+        $this->post('/actors', [
+            'name' => "Билл Скарсгорд",
+            'movies' => '[1]',
+        ])
+    );
+
+    $response = decodeResponse(
+        $this->post('/actors', [
+            'name' => "Джейден Либерер",
+            'movies' => '[1]',
+        ])
+    );
+
+    $actors = Movie::find($response[0]->id)->actors;
+
+    $this->assertEquals(count($actors), 2);
+    $this->assertEquals($actors[0]->name, "Билл Скарсгорд");
+    $this->assertEquals($actors[1]->name, "Джейден Либерер");
 });
