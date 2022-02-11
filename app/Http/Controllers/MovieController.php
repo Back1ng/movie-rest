@@ -14,8 +14,8 @@ class MovieController extends Controller
      * Display a listing of the resource.
      *
      * Accepted GET parameters:
-     * genre - genre id (not required)
-     * actor - actor id (not required)
+     * genre_id - genre id (not required)
+     * actor_id - actor id (not required)
      * sortBy - field (not required)
      * sortType - asc or desc (not required)
      *
@@ -29,12 +29,12 @@ class MovieController extends Controller
     {
         $movies = new MovieRepository();
 
-        if ($request->has('genre')) {
-            $movies->whereGenre($request->get('genre'));
+        if ($request->has('genre_id')) {
+            $movies->whereGenre($request->get('genre_id'));
         }
 
-        if ($request->has('actor')) {
-            $movies->whereActor($request->get('actor'));
+        if ($request->has('actor_id')) {
+            $movies->whereActor($request->get('actor_id'));
         }
 
         if ($request->has('sortBy')) {
