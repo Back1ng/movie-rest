@@ -35,7 +35,7 @@ it('throw error when trying add to non-existent movie', function () {
     $this->assertEquals($response, 'Movie 111 not found.');
 });
 
-it('actor can be destroyed', function () {
+test('actor can be destroyed', function () {
     $response = decodeResponse(
         $this->post('/actors', ['name' => "Good Name"])
     );
@@ -73,4 +73,17 @@ test('actor can be added with movie', function () {
     $this->assertEquals(count($actors), 2);
     $this->assertEquals($actors[0]->name, "Билл Скарсгорд");
     $this->assertEquals($actors[1]->name, "Джейден Либерер");
+});
+
+test("actor can be updated", function() {
+    $actorId = decodeResponse(
+        $this->post('/actors', ['name' => "Билл Скарсгорд"])
+    )->id;
+
+    $response = decodeResponse(
+        $this->put('/actors/' . $actorId, ['name' => 'Джейден Либерер'])
+    );
+
+    $this->assertEquals($response->name, 'Джейден Либерер');
+    $this->assertEquals($response->id, $actorId);
 });
