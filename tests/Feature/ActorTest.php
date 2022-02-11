@@ -48,20 +48,23 @@ it('actor can be destroyed', function () {
 });
 
 test('actor can be added with movie', function () {
-    $this->post('/genres', ['name' => 'Ужасы']);
-    $this->post('movies', ['name' => 'Оно', 'genre_id' => 1]);
-
-    $response = decodeResponse(
-        $this->post('/actors', [
-            'name' => "Билл Скарсгорд",
-            'movies' => '[1]',
-        ])
+    $responseGenre = decodeResponse(
+        $this->post('/genres', ['name' => 'Ужасы'])
     );
+
+    $movieResponse = decodeResponse(
+        $this->post('movies', ['name' => 'Оно', 'genre_id' => $responseGenre->id])
+    );
+
+    $this->post('/actors', [
+        'name' => "Билл Скарсгорд",
+        'movies' => sprintf('[%s]', $movieResponse->id),
+    ]);
 
     $response = decodeResponse(
         $this->post('/actors', [
             'name' => "Джейден Либерер",
-            'movies' => '[1]',
+            'movies' => sprintf('[%s]', $movieResponse->id),
         ])
     );
 
