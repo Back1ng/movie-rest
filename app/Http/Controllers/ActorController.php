@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Actor;
+use App\Models\Movie;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 class ActorController extends Controller
 {
@@ -35,16 +35,10 @@ class ActorController extends Controller
         if ($request->has('movies')) {
             $movies = json_decode($request->post('movies'));
 
-            if (is_array($movies)) {
-                if ($movies === []) {
-                    $actor->movies()->detach();
-                } else {
-                    foreach ($movies as $movie) {
-                        $actor->movies()->detach($movie);
-
-                        $actor->movies()->attach($movie);
-                    }
-                }
+            try {
+                Movie::attachMoviesTo($actor, $movies);
+            } catch (\Exception $e) {
+                return response()->json($e->getMessage());
             }
 
             return response()->json($actor->movies);
