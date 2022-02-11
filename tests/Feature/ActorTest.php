@@ -2,13 +2,12 @@
 
 use Database\Seeders\ActorSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
 
-uses(RefreshDatabase::class);
+uses()->beforeEach(function () {
+    $this->seed(ActorSeeder::class);
+});
 
 test('actor index method return all records', function () {
-    $this->seed(ActorSeeder::class);
-
     $response = decodeResponse(
         $this->get('/actors')
     );
@@ -22,7 +21,7 @@ test('actor created without movies', function() {
     );
 
     $this->assertEquals($response->name, "Good Name");
-    $this->assertEquals($response->id, 11);
+    $this->assertEquals($response->id, 21);
 });
 
 it('throw error when trying add to non-existent movie', function () {
@@ -36,4 +35,16 @@ it('throw error when trying add to non-existent movie', function () {
     $this->assertEquals($response, 'Movie 111 not found.');
 });
 
+it('actor can be destroyed', function () {
+    $response = decodeResponse(
+        $this->post('/actors', ['name' => "Good Name"])
+    );
 
+    $this->assertDatabaseCount('actors', 11);
+
+    $response = decodeResponse(
+        $this->delete('/actors/' . $response->id)
+    );
+
+    $this->assertDatabaseCount('actors', 10);
+});
