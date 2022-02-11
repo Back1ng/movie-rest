@@ -68,7 +68,7 @@ test('actor can be added with movie', function () {
         ])
     );
 
-    $actors = Movie::find($response[0]->id)->actors;
+    $actors = Movie::find($movieResponse->id)->actors;
 
     $this->assertEquals(count($actors), 2);
     $this->assertEquals($actors[0]->name, "Билл Скарсгорд");
