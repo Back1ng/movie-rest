@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Genre;
+use App\Models\Movie;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,9 +16,8 @@ class MovieSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('movies')->insert([
-            'name' => Str::random(10),
-            'genre_id' => Genre::find(random_int(0, 9))
-        ]);
+        Movie::factory()
+            ->count(50)
+            ->create();
     }
 }
