@@ -18,13 +18,7 @@ class MovieFactory extends Factory
     public function definition()
     {
         return [
-            'genre_id' => function () {
-                $count = Genre::all()->count();
-                if ($count > 1) {
-                    return random_int(1, $count);
-                }
-                return factory(Genre::class)->create()->id;
-            },
+            'genre_id' => Genre::all()->random()->id,
             'name' => $this->faker->sentence(3)
         ];
     }
