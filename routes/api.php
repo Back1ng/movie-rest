@@ -21,6 +21,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('movies', MovieController::class);
-Route::resource('genres', GenreController::class);
-Route::resource('actors', ActorController::class);
+Route::apiResources([
+    'movies' => MovieController::class,
+    'genres' => GenreController::class,
+    'actors' => ActorController::class
+]);
