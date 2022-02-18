@@ -61,9 +61,9 @@ class ActorController extends Controller
      */
     public function update(UpdateActorRequest $request, Actor $actor): JsonResponse
     {
-        $actor->name = $request->validated()['name'];
-
-        $actor->save();
+        $actor->update([
+            'name' => $request->validated('name')
+        ]);
 
         return response()->json($actor);
     }
