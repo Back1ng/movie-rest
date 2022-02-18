@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Api\StoreGenreRequest;
+use App\Http\Requests\Api\UpdateGenreRequest;
 use App\Models\Genre;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,49 +17,41 @@ class GenreController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(Genre::all());
+        return response()->json(Genre::paginate());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param StoreGenreRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreGenreRequest $request): JsonResponse
     {
-        return response()->json(
-            Genre::firstOrCreate(
-                $request->validate([
-                    'name' => 'string|required'
-                ])
-            )
-        );
+        return response()->json(Genre::create($request->validated()));
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param Genre $genre
      * @return JsonResponse
      */
-    public function show(int $id): JsonResponse
+    public function show(Genre $genre): JsonResponse
     {
-        return response()->json(Genre::find($id));
+        return response()->json($genre);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param  int  $id
+     * @param Genre $genre
      * @return JsonResponse
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateGenreRequest $request, Genre $genre): JsonResponse
     {
-        $genre = Genre::find($id);
-
-        $genre->name = $request->validate(['name' => 'string|required'])['name'];
+        $genre->name = $request->validated()['name'];
 
         $genre->save();
 
@@ -67,11 +61,11 @@ class GenreController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Genre $genre
      * @return JsonResponse
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(Genre $genre): JsonResponse
     {
-        return response()->json(Genre::destroy($id));
+        return response()->json($genre->delete());
     }
 }
