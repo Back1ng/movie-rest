@@ -22,8 +22,8 @@ class UpdateMovieRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'string|nullable',
-            'genre_id' => 'numeric|nullable|exists:genres,id'
+            'name' => 'string|required',
+            'genre_id' => 'numeric|required|exists:genres,id'
         ];
     }
 }

@@ -33,7 +33,7 @@ class MovieController extends Controller
 
         $movie = $movieRepository->buildQuery($validated);
 
-        return response()->json($movie->get());
+        return response()->json($movie->paginate());
     }
 
     /**
@@ -69,15 +69,10 @@ class MovieController extends Controller
     {
         $data = $request->validated();
 
-        if (! empty($data['name'])) {
-            $movie->name = $data['name'];
-        }
-
-        if (! empty($data['genre_id'])) {
-            $movie->genre_id = $data['genre_id'];
-        }
-
-        $movie->save();
+        $movie->update([
+            'name' => $data['name'],
+            'genre_id' => $data['genre_id']
+        ]);
 
         return response()->json($movie);
     }
