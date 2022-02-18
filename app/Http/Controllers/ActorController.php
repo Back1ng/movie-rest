@@ -44,7 +44,7 @@ class ActorController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param Actor $actor
      * @return JsonResponse
      */
     public function show(Actor $actor): JsonResponse
@@ -71,7 +71,7 @@ class ActorController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Actor $actor
      * @return JsonResponse
      */
     public function destroy(Actor $actor): JsonResponse
