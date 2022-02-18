@@ -6,6 +6,7 @@ use App\Http\Requests\Api\StoreActorRequest;
 use App\Http\Requests\Api\UpdateActorRequest;
 use App\Models\Actor;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 
 class ActorController extends Controller
 {
@@ -34,7 +35,7 @@ class ActorController extends Controller
 
         $actor = Actor::create($validated);
 
-        if ($request->has('movies')) {
+        if (Arr::has($validated, 'movies')) {
             $actor->movies()->sync($validated['movies']);
         }
 
