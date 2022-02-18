@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
-class StoreGenreRequest extends FormRequest
+class UpdateMovieRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,8 @@ class StoreGenreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'string|required'
+            'name' => 'string|nullable',
+            'genre_id' => 'numeric|nullable|exists:genres,id'
         ];
     }
 }

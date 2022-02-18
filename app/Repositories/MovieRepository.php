@@ -2,56 +2,76 @@
 
 namespace App\Repositories;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Movie;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
 
 class MovieRepository
 {
-    private $query;
+    private Builder $query;
 
-    private string $tableName = 'movies';
+    private array $data;
 
     public function __construct()
     {
-        $this->query = DB::table($this->getTableName());
+        $this->query = Movie::query();
     }
 
-    public function whereGenre($id)
+    /**
+     * @param mixed $validated
+     * @return Builder
+     */
+    public function buildQuery(array $validated): Builder
     {
-        $this->query->where('genre_id', '=', $id);
+        $this->data = $validated;
+
+        $this->whereGenre()
+            ->whereActor()
+            ->addSort();
+
+        return $this->query;
     }
 
-    public function whereActor($id)
+    /**
+     * @return MovieRepository
+     */
+    private function whereGenre(): self
     {
-        $this->query->join('actor_movie', 'movie_id', '=', 'movies.id');
-        $this->query->where('actor_movie.actor_id', '=', $id);
-        $this->query->leftJoin('actors', 'actors.id', '=', 'actor_movie.actor_id');
-
-        $this->query->select(
-            'movies.id',
-            'movies.genre_id',
-            'movies.name',
-            'actors.name as actor_name',
-            'movies.created_at',
-            'movies.updated_at'
-        );
-    }
-
-    public function withSort(string $field, string $type = 'asc') {
-        if ($field === 'name') {
-            match ($type) {
-                'asc' => $this->query->orderBy('movies.name'),
-                'desc' => $this->query->orderByDesc('movies.name'),
-            };
+        if (Arr::has($this->data, 'genre_id')) {
+            $this->query->where('genre_id', $this->data['genre_id']);
         }
+
+        return $this;
     }
 
-    public function getResult()
+    /**
+     * @return MovieRepository
+     */
+    private function whereActor(): self
     {
-        return $this->query->get();
+        if (Arr::has($this->data, 'actor_id')) {
+            $this->query->whereRelation('actors', 'actor_id', $this->data['actor_id']);
+        }
+
+        return $this;
     }
 
-    public function getTableName()
+    /**
+     * @return MovieRepository
+     */
+    private function addSort(): self
     {
-        return $this->tableName;
+        if (Arr::has($this->data, 'sortBy')) {
+            if (Arr::has($this->data, 'sortType')) {
+                match ($this->data['sortType']) {
+                    'desc' => $this->query->latest($this->data['sortBy']),
+                    'default' => $this->query->oldest($this->data['sortBy']),
+                };
+            } else {
+                $this->query->oldest($this->data['sortBy']);
+            }
+        }
+
+        return $this;
     }
 }

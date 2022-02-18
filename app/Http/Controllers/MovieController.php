@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Api\IndexMovieRequest;
+use App\Http\Requests\Api\StoreMovieRequest;
+use App\Http\Requests\Api\UpdateMovieRequest;
 use App\Models\Movie;
 use App\Repositories\MovieRepository;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class MovieController extends Controller
 {
@@ -22,74 +23,51 @@ class MovieController extends Controller
      * By default, return columns: id, genre_id, name, timestamps
      * If actor id is included, return next columns: id, genre_id, name, actor_name, timestamps
      *
-     * @param Request $request
+     * @param IndexMovieRequest $request
+     * @param MovieRepository $movieRepository
      * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(IndexMovieRequest $request, MovieRepository $movieRepository): JsonResponse
     {
-        $movies = new MovieRepository();
+        $validated = $request->validated();
 
-        if ($request->has('genre_id')) {
-            $movies->whereGenre($request->get('genre_id'));
-        }
+        $movie = $movieRepository->buildQuery($validated);
 
-        if ($request->has('actor_id')) {
-            $movies->whereActor($request->get('actor_id'));
-        }
-
-        if ($request->has('sortBy')) {
-            if ($request->has('sortType')) {
-                $movies->withSort($request->get('sortBy'), $request->get('sortType'));
-            } else {
-                $movies->withSort($request->get('sortBy'));
-            }
-        }
-
-        return response()->json($movies->getResult());
+        return response()->json($movie->get());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param StoreMovieRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreMovieRequest $request): JsonResponse
     {
-        return response()->json(
-            Movie::create($request->validate([
-                'name' => 'string|required',
-                'genre_id' => 'numeric|required',
-            ]))
-        );
+        return response()->json(Movie::create($request->validated()));
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param Movie $movie
      * @return JsonResponse
      */
-    public function show(int $id): JsonResponse
+    public function show(Movie $movie): JsonResponse
     {
-        return response()->json(Movie::find($id));
+        return response()->json($movie);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param  int  $id
+     * @param UpdateMovieRequest $request
+     * @param Movie $movie
      * @return JsonResponse
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateMovieRequest $request, Movie $movie): JsonResponse
     {
-        $movie = Movie::find($id);
-
-        $data = $request->validate([
-            'genre_id' => 'numeric',
-            'name' => 'string',
-        ]);
+        $data = $request->validated();
 
         if (! empty($data['name'])) {
             $movie->name = $data['name'];
@@ -107,11 +85,11 @@ class MovieController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Movie $movie
      * @return JsonResponse
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(Movie $movie): JsonResponse
     {
-        return response()->json(Movie::destroy($id));
+        return response()->json($movie->delete());
     }
 }
