@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Api\StoreActorRequest;
+use App\Http\Requests\Api\UpdateActorRequest;
 use App\Models\Actor;
-use App\Models\Movie;
-use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ActorController extends Controller
 {
@@ -17,7 +16,7 @@ class ActorController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(Actor::all());
+        return response()->json(Actor::paginate());
     }
 
     /**
@@ -26,27 +25,17 @@ class ActorController extends Controller
      * Accepted post params:
      * [movies:int[]|null]
      *
-     * @param Request $request
+     * @param StoreActorRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreActorRequest $request): JsonResponse
     {
-        $actor = Actor::firstOrCreate(
-            $request->validate([
-                'name' => 'string|required'
-            ])
-        );
+        $validated = $request->validated();
+
+        $actor = Actor::create($validated);
 
         if ($request->has('movies')) {
-            $movies = json_decode($request->post('movies'));
-
-            try {
-                Movie::attachMoviesTo($actor, $movies);
-            } catch (Exception $e) {
-                return response()->json($e->getMessage());
-            }
-
-            return response()->json($actor->movies);
+            $actor->movies()->sync($validated['movies']);
         }
 
         return response()->json($actor);
@@ -58,23 +47,21 @@ class ActorController extends Controller
      * @param  int  $id
      * @return JsonResponse
      */
-    public function show(int $id): JsonResponse
+    public function show(Actor $actor): JsonResponse
     {
-        return response()->json(Actor::find($id));
+        return response()->json($actor);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param  int  $id
+     * @param UpdateActorRequest $request
+     * @param Actor $actor
      * @return JsonResponse
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateActorRequest $request, Actor $actor): JsonResponse
     {
-        $actor = Actor::find($id);
-
-        $actor->name = $request->validate(['name' => 'string|required'])['name'];
+        $actor->name = $request->validated()['name'];
 
         $actor->save();
 
@@ -87,8 +74,8 @@ class ActorController extends Controller
      * @param  int  $id
      * @return JsonResponse
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(Actor $actor): JsonResponse
     {
-        return response()->json(Actor::destroy($id));
+        return response()->json($actor->delete());
     }
 }
