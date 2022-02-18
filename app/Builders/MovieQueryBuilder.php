@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Builders;
 
 use App\Models\Movie;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 
-class MovieRepository
+class MovieQueryBuilder
 {
     private Builder $query;
 
@@ -21,7 +21,7 @@ class MovieRepository
      * @param mixed $validated
      * @return Builder
      */
-    public function buildQuery(array $validated): Builder
+    public function build(array $validated): Builder
     {
         $this->data = $validated;
 
@@ -33,7 +33,7 @@ class MovieRepository
     }
 
     /**
-     * @return MovieRepository
+     * @return MovieQueryBuilder
      */
     private function whereGenre(): self
     {
@@ -45,7 +45,7 @@ class MovieRepository
     }
 
     /**
-     * @return MovieRepository
+     * @return MovieQueryBuilder
      */
     private function whereActor(): self
     {
@@ -57,7 +57,7 @@ class MovieRepository
     }
 
     /**
-     * @return MovieRepository
+     * @return MovieQueryBuilder
      */
     private function addSort(): self
     {

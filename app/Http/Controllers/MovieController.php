@@ -6,7 +6,7 @@ use App\Http\Requests\Api\IndexMovieRequest;
 use App\Http\Requests\Api\StoreMovieRequest;
 use App\Http\Requests\Api\UpdateMovieRequest;
 use App\Models\Movie;
-use App\Repositories\MovieRepository;
+use App\Builders\MovieQueryBuilder;
 use Illuminate\Http\JsonResponse;
 
 class MovieController extends Controller
@@ -24,14 +24,14 @@ class MovieController extends Controller
      * If actor id is included, return next columns: id, genre_id, name, actor_name, timestamps
      *
      * @param IndexMovieRequest $request
-     * @param MovieRepository $movieRepository
+     * @param MovieQueryBuilder $movieQueryBuilder
      * @return JsonResponse
      */
-    public function index(IndexMovieRequest $request, MovieRepository $movieRepository): JsonResponse
+    public function index(IndexMovieRequest $request, MovieQueryBuilder $movieQueryBuilder): JsonResponse
     {
         $validated = $request->validated();
 
-        $movie = $movieRepository->buildQuery($validated);
+        $movie = $movieQueryBuilder->build($validated);
 
         return response()->json($movie->paginate());
     }
