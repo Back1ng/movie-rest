@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\Actor;
 use App\Models\Movie;
 use Database\Seeders\ActorSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses()->beforeEach(function () {
+uses(RefreshDatabase::class)->beforeEach(function () {
     $this->seed(ActorSeeder::class);
 });
 
@@ -12,7 +14,7 @@ test('actor index method return all records', function () {
         $this->get('/actors')
     );
 
-    $this->assertEquals(count($response), 10);
+    $this->assertEquals(count($response->data), 15);
 });
 
 test('actor created without movies', function() {
@@ -21,30 +23,31 @@ test('actor created without movies', function() {
     );
 
     $this->assertEquals($response->name, "Good Name");
-    $this->assertEquals($response->id, 21);
 });
 
 test('store actor throw an error when adding non-existing movie', function () {
     $response = decodeResponse(
         $this->post('/actors', [
             'name' => "Good Name",
-            'movies' => '[111, 222]',
+            'movies' => '[11111, 22222]',
         ])
     );
 
-    $this->assertEquals($response, 'Movie 111 not found.');
+    $this->assertEquals(count((array)$response->errors), 2);
 });
 
 test('actor can be destroyed', function () {
+    $actorCount = Actor::all()->count();
+
     $response = decodeResponse(
         $this->post('/actors', ['name' => "Good Name"])
     );
 
-    $this->assertDatabaseCount('actors', 11);
+    $this->assertDatabaseCount('actors', $actorCount + 1);
 
     $this->delete('/actors/' . $response->id);
 
-    $this->assertDatabaseCount('actors', 10);
+    $this->assertDatabaseCount('actors', $actorCount);
 });
 
 test('actor can be added with movie', function () {
